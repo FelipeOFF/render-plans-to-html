@@ -19,11 +19,19 @@ Works with output from [GSD](https://github.com/), [Superpowers](https://github.
 - **Self-contained output** — single `.html` with all CSS and JS inlined. No external network at runtime.
 - **Available as a skill** for both [Claude Code](https://claude.com/claude-code) and Codex.
 
-## Installation
+## Quickstart — zero install
 
-### As a skill (Claude Code and/or Codex) — recommended
+Run the renderer directly via `npx` (no install needed):
 
-Install via `npx` directly from npm:
+```bash
+npx --yes render-plans-to-html docs/ --out plans.html
+```
+
+That is also exactly how the skill invokes itself when an agent decides to render. The first call downloads the package (~800 KB) into the npm cache; subsequent calls are instant.
+
+## Install as a skill (Claude Code and/or Codex)
+
+For agents to discover the skill by description (so the user can just say "render this plan to HTML"), register it once into the agent's skills directory:
 
 ```bash
 npx render-plans-to-html-install              # auto-detect ~/.claude and/or ~/.agents
@@ -33,21 +41,22 @@ npx render-plans-to-html-install --all        # install to both
 npx render-plans-to-html-install --uninstall  # remove
 ```
 
-Or run it straight from GitHub without publishing:
+Or straight from GitHub:
 
 ```bash
 npx --package=github:FelipeOFF/render-plans-to-html -- render-plans-to-html-install --all
 ```
 
-The installer copies the package to the agent's skills directory, runs `npm install --omit=dev`, and symlinks the CLI into `~/.local/bin/render-plans`.
+The installer copies the SKILL.md and CLI to the agent's skills directory, runs `npm install --omit=dev`, and symlinks `render-plans` into `~/.local/bin`.
 
-### As a CLI only (no skill)
+| Agent | Skills directory |
+|-------|------------------|
+| Claude Code | `~/.claude/skills/render-plans-to-html` |
+| Codex | `~/.agents/skills/render-plans-to-html` |
 
-```bash
-npx render-plans-to-html docs/ --out plans.html
-```
+Both can be overridden via `CLAUDE_SKILLS_DIR` and `CODEX_SKILLS_DIR` environment variables.
 
-Or clone and use locally:
+## Local development
 
 ```bash
 git clone https://github.com/FelipeOFF/render-plans-to-html.git
@@ -66,7 +75,7 @@ Both can be overridden via `CLAUDE_SKILLS_DIR` and `CODEX_SKILLS_DIR` environmen
 ## Usage
 
 ```bash
-render-plans <path>[,path2,...] [--out output.html] [--title "Phase v1.9"] [--theme dark]
+npx --yes render-plans-to-html <path>[,path2,...] [--out output.html] [--title "Phase v1.9"] [--theme dark]
 ```
 
 `<path>` accepts:
@@ -79,13 +88,13 @@ render-plans <path>[,path2,...] [--out output.html] [--title "Phase v1.9"] [--th
 
 ```bash
 # Single plan
-render-plans docs/plan.md --out plan.html
+npx --yes render-plans-to-html docs/plan.md --out plan.html
 
 # Whole phase folder
-render-plans .planning/phase-3 --out phase-3.html --title "Phase 3"
+npx --yes render-plans-to-html .planning/phase-3 --out phase-3.html --title "Phase 3"
 
 # Mixed list
-render-plans PLAN.md,REVIEW.md,RESEARCH.md --out review.html
+npx --yes render-plans-to-html PLAN.md,REVIEW.md,RESEARCH.md --out review.html
 ```
 
 ## Requirements
@@ -105,10 +114,12 @@ src/
   template.js   # HTML shell with inlined assets
   assemble.js   # multi-doc HTML composition
   assets/       # styles, client JS, vendored hljs and mermaid
+bin/
+  render-plans.js  # renderer entrypoint (npx render-plans-to-html)
+  install.js       # optional installer (npx render-plans-to-html-install)
 skill/
-  SKILL.md      # skill manifest (Claude Code / Codex)
-  install.sh    # dual-target installer
-tests/          # vitest suites
+  SKILL.md         # skill manifest (Claude Code / Codex)
+tests/             # vitest suites
 ```
 
 ## Development

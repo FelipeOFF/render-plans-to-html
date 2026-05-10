@@ -1,7 +1,7 @@
 ---
 name: render-plans-to-html
 description: Use when the user wants to render, visualize, or share Markdown planning artifacts (PLAN.md, REVIEW.md, REQUIREMENTS.md, tasks.md, RESEARCH.md, design.md, or generic .md) as a single self-contained HTML dashboard with sidebar nav, status pills, severity tags, mermaid diagrams, syntax highlighting and dark/light themes. Triggers: "render plan to HTML", "gerar HTML do plano", "transformar MD em HTML", "share this spec in browser", phase artifact handoff to non-engineers.
-version: 0.1.0
+version: 0.1.1
 ---
 
 # render-plans-to-html
@@ -18,17 +18,20 @@ Convert any Markdown planning artifact into one self-contained, offline-capable 
 
 - Designing product UI — use `frontend-design` or `huashu-design` instead.
 - Editing source-of-truth Markdown — this skill never modifies inputs.
-- One-off Markdown preview a regular viewer can already do.
 
-## Workflow
+## How to Run It
+
+This skill runs via `npx` — no prior install required. Node.js ≥ 20 must be available on `$PATH`.
 
 1. **Resolve input.** Accept a single `.md` file, a folder (recursive `*.md` discovery), or a comma-separated list of paths. Ask only if not provided.
 2. **Resolve output.** Default: `<cwd>/plans.html`. Override with `--out`.
-3. **Run the CLI:**
+3. **Execute the renderer:**
 
 ```bash
-render-plans <path>[,path2,...] [--out output.html] [--title "Phase v1.9"] [--theme dark]
+npx --yes render-plans-to-html <path>[,path2,...] [--out output.html] [--title "Phase v1.9"] [--theme dark]
 ```
+
+The first run downloads the package into the npm cache (~800 KB); subsequent runs are instant.
 
 4. **Report.** Print the absolute output path and offer to open it (`open <path>` on macOS, `xdg-open <path>` on Linux).
 
@@ -57,18 +60,17 @@ render-plans <path>[,path2,...] [--out output.html] [--title "Phase v1.9"] [--th
 | Flag | Default | Purpose |
 |------|---------|---------|
 | `--out` | `./plans.html` | Output file path |
-| `--title` | `Plans (N)` | Document title shown in sidebar header |
+| `--title` | `Plans (N)` | Title shown in sidebar header |
 | `--theme` | `auto` | Initial theme: `light`, `dark`, or `auto` |
 
-## Installation
+## Optional: Local Install
+
+If the user wants to install the CLI globally (so `render-plans` is always on `$PATH`), run the installer once:
 
 ```bash
-npx render-plans-to-html-install --all   # Claude Code + Codex
-npx render-plans-to-html-install         # auto-detect
+npx render-plans-to-html-install --all       # Claude Code + Codex
+npx render-plans-to-html-install --claude    # Claude Code only
+npx render-plans-to-html-install --codex     # Codex only
 ```
 
-Skill directories:
-- **Claude Code:** `~/.claude/skills/render-plans-to-html`
-- **Codex:** `~/.agents/skills/render-plans-to-html`
-
-The CLI is symlinked at `~/.local/bin/render-plans` so it is callable from anywhere on `$PATH`.
+This is **not required** — the `npx --yes render-plans-to-html` flow above works without any local install.

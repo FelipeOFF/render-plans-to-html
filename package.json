@@ -1,9 +1,10 @@
 {
   "name": "render-plans-to-html",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Tool-agnostic renderer that turns Markdown plans/specs/reviews into a single self-contained interactive HTML dashboard. Available as a skill for Claude Code and Codex.",
   "type": "module",
   "bin": {
+    "render-plans-to-html": "./bin/render-plans.js",
     "render-plans": "./bin/render-plans.js",
     "render-plans-to-html-install": "./bin/install.js"
   },
