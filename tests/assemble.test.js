@@ -32,3 +32,17 @@ describe('assembleHtml', () => {
 function emptySignals() {
   return { checkboxes: { todo: 0, done: 0, total: 0 }, severities: { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 }, toc: [], refs: [], mermaid: [] };
 }
+
+import { loadMessages } from '../src/i18n.js';
+
+describe('assembleHtml with overview', () => {
+  it('prepends an overview synthetic doc', () => {
+    const docs = [
+      { id: 'd0', title: 'A', type: 'plan', bodyHtml: '<p>a</p>', signals: emptySignals() },
+    ];
+    const html = assembleHtml(docs, { title: 'X', overviewHtml: '<div data-marker="ov"></div>', messages: loadMessages('pt-BR') });
+    expect(html).toMatch(/data-target="overview"/);
+    expect(html).toMatch(/data-marker="ov"/);
+    expect(html).toMatch(/Referências|References/);
+  });
+});
