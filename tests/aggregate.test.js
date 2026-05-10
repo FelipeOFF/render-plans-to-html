@@ -1,5 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
+import { execSync } from 'node:child_process';
+import os from 'node:os';
+import path from 'node:path';
 import { aggregate, parseTasks } from '../src/aggregate.js';
 
 const fixtureMd = fs.readFileSync('tests/fixtures/plan-with-tasks.md', 'utf8');
@@ -57,6 +60,42 @@ describe('aggregate', () => {
       d0: { CRITICAL: 1, HIGH: 0, MEDIUM: 2, LOW: 0 },
     });
     expect(phase.tasks).toHaveLength(3);
+    expect(phase.burndownTimeline).toBe(null);
+  });
+});
+
+describe('aggregate burndown', () => {
+  it('builds a timeline from a tiny git repo', async () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rph-burn-'));
+    execSync('git init -q', { cwd: tmp });
+    execSync('git config user.email t@t.local', { cwd: tmp });
+    execSync('git config user.name T', { cwd: tmp });
+    const file = path.join(tmp, 'PLAN.md');
+    fs.writeFileSync(file, '## Task 1: A\n\n- [ ] s1\n- [ ] s2\n');
+    execSync('git add PLAN.md && git commit -q -m c1', { cwd: tmp, shell: '/bin/bash' });
+    fs.writeFileSync(file, '## Task 1: A\n\n- [x] s1\n- [ ] s2\n');
+    execSync('git add PLAN.md && git commit -q -m c2', { cwd: tmp, shell: '/bin/bash' });
+    fs.writeFileSync(file, '## Task 1: A\n\n- [x] s1\n- [x] s2\n');
+    execSync('git add PLAN.md && git commit -q -m c3', { cwd: tmp, shell: '/bin/bash' });
+
+    const docs = [
+      { id: 'd0', title: 'Plan', type: 'plan', rawMd: fs.readFileSync(file, 'utf8'),
+        path: file, signals: { severities: { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 } } },
+    ];
+    const phase = await aggregate(docs, { gitDir: tmp, burndownCommits: 12 });
+    expect(phase.burndownTimeline).not.toBeNull();
+    expect(phase.burndownTimeline.length).toBeGreaterThanOrEqual(2);
+    const last = phase.burndownTimeline[phase.burndownTimeline.length - 1];
+    expect(last.done).toBe(2);
+    expect(last.total).toBe(2);
+  });
+
+  it('returns null timeline outside a git repo', async () => {
+    const docs = [
+      { id: 'd0', title: 'P', type: 'plan', rawMd: '## Task 1: x\n- [ ] a\n', path: '/tmp/nope.md',
+        signals: { severities: { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 } } },
+    ];
+    const phase = await aggregate(docs, { gitDir: '/no/such/path' });
     expect(phase.burndownTimeline).toBe(null);
   });
 });

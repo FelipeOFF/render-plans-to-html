@@ -1,3 +1,6 @@
+import { execFileSync } from 'node:child_process';
+import path from 'node:path';
+
 const KEYWORD_RE = /\b(refactor|vendor|e2e|migration|architecture)\b/i;
 const TASK_HEADING_RE = /^#{2,3}\s+Task\s+([\w.-]+)\s*:\s*(.+?)\s*$/i;
 const FILES_BLOCK_RE = /\*\*Files:\*\*([\s\S]*?)(?=\n#{1,6}\s|\n- \[|\n\*\*|\n$)/i;
@@ -92,12 +95,71 @@ export async function aggregate(docs, options = {}) {
   const tasksTotal = tasksPerDoc.reduce((n, p) => n + p.total, 0);
   const tasksDone = tasksPerDoc.reduce((n, p) => n + p.done, 0);
 
+  let burndownTimeline = null;
+  if (options.gitDir) {
+    burndownTimeline = await computeBurndown(docs, options);
+  }
+
   return {
     totals: { tasksTotal, tasksDone, tasksPending: tasksTotal - tasksDone },
     tasks: tasksAll,
     tasksPerDoc,
     severityTotals,
     severityByDoc,
-    burndownTimeline: null,
+    burndownTimeline,
   };
+}
+
+async function computeBurndown(docs, options) {
+  const cwd = options.gitDir;
+  const cap = options.burndownCommits || 12;
+  let inRepo;
+  try {
+    execFileSync('git', ['rev-parse', '--git-dir'], { cwd, stdio: 'ignore' });
+    inRepo = true;
+  } catch { inRepo = false; }
+  if (!inRepo) return null;
+
+  const docsWithPath = docs.filter(d => d.path);
+  if (docsWithPath.length === 0) return null;
+
+  const commitMap = new Map();
+  let order = 0;
+  for (const d of docsWithPath) {
+    const rel = path.relative(cwd, d.path);
+    let log;
+    try {
+      log = execFileSync('git', ['log', '--reverse', `-${cap}`, '--pretty=%H|%ct', '--', rel], { cwd, encoding: 'utf8' });
+    } catch { continue; }
+    const lines = log.trim().split('\n').filter(Boolean);
+    for (const ln of lines) {
+      const [hash, ct] = ln.split('|');
+      if (!commitMap.has(hash)) commitMap.set(hash, { hash, ts: parseInt(ct, 10) * 1000, order: order++ });
+    }
+  }
+
+  for (const commit of commitMap.values()) {
+    let total = 0, done = 0;
+    for (const d of docsWithPath) {
+      const rel = path.relative(cwd, d.path);
+      let blob;
+      try {
+        blob = execFileSync('git', ['show', `${commit.hash}:${rel}`], { cwd, encoding: 'utf8' });
+      } catch { continue; }
+      const tasks = parseTasks(blob, d.id);
+      for (const t of tasks) {
+        total += t.steps.length;
+        done += t.steps.filter(s => s.done).length;
+      }
+    }
+    commit.total = total;
+    commit.done = done;
+  }
+
+  const timeline = Array.from(commitMap.values())
+    .filter(c => c.total != null)
+    .sort((a, b) => (a.ts - b.ts) || (a.order - b.order))
+    .map(c => ({ ts: c.ts, hash: c.hash, done: c.done, total: c.total }));
+
+  return timeline.length >= 2 ? timeline : null;
 }
