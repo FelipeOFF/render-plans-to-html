@@ -21,25 +21,40 @@ Funciona com saídas de [GSD](https://github.com/), [Superpowers](https://github
 
 ## Instalação
 
-### Como CLI
+### Como skill (Claude Code e/ou Codex) — recomendado
+
+Instalar via `npx` direto do npm:
 
 ```bash
-git clone https://github.com/<sua-org>/render-plans-to-html.git
+npx render-plans-to-html-install              # auto-detecta ~/.claude e/ou ~/.agents
+npx render-plans-to-html-install --claude     # apenas Claude Code
+npx render-plans-to-html-install --codex      # apenas Codex
+npx render-plans-to-html-install --all        # instala em ambos
+npx render-plans-to-html-install --uninstall  # desinstala
+```
+
+Ou rodar direto do GitHub (sem precisar publicar):
+
+```bash
+npx --package=github:FelipeOFF/render-plans-to-html -- render-plans-to-html-install --all
+```
+
+O instalador copia o pacote para o diretório de skills do agente, roda `npm install --omit=dev` e cria um symlink do CLI em `~/.local/bin/render-plans`.
+
+### Apenas como CLI (sem skill)
+
+```bash
+npx render-plans-to-html docs/ --out plans.html
+```
+
+Ou clonando local:
+
+```bash
+git clone https://github.com/FelipeOFF/render-plans-to-html.git
 cd render-plans-to-html
 npm install
+node bin/render-plans.js docs/ --out plans.html
 ```
-
-### Como skill (Claude Code e/ou Codex)
-
-```bash
-./skill/install.sh              # auto-detecta ~/.claude e/ou ~/.agents
-./skill/install.sh --claude     # apenas Claude Code
-./skill/install.sh --codex      # apenas Codex
-./skill/install.sh --all        # instala em ambos
-./skill/install.sh --uninstall  # desinstala
-```
-
-O instalador copia o projeto para o diretório de skills do agente e cria um symlink do CLI em `~/.local/bin/render-plans`.
 
 | Agente | Diretório de skills |
 |--------|---------------------|

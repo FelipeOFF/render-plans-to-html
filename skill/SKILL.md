@@ -60,10 +60,15 @@ render-plans <path>[,path2,...] [--out output.html] [--title "Phase v1.9"] [--th
 | `--title` | `Plans (N)` | Document title shown in sidebar header |
 | `--theme` | `auto` | Initial theme: `light`, `dark`, or `auto` |
 
-## Installation Path
+## Installation
 
-The CLI is installed at the agent-specific skill directory:
-- **Claude Code:** `~/.claude/skills/render-plans-to-html/bin/render-plans.js`
-- **Codex:** `~/.agents/skills/render-plans-to-html/bin/render-plans.js`
+```bash
+npx render-plans-to-html-install --all   # Claude Code + Codex
+npx render-plans-to-html-install         # auto-detect
+```
 
-A symlink is placed at `~/.local/bin/render-plans` so the CLI is callable as `render-plans` from anywhere on `$PATH`.
+Skill directories:
+- **Claude Code:** `~/.claude/skills/render-plans-to-html`
+- **Codex:** `~/.agents/skills/render-plans-to-html`
+
+The CLI is symlinked at `~/.local/bin/render-plans` so it is callable from anywhere on `$PATH`.
