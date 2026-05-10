@@ -1,7 +1,7 @@
 ---
 name: render-plans-to-html
 description: Use when the user wants to render, visualize, or share Markdown planning artifacts (PLAN.md, REVIEW.md, REQUIREMENTS.md, tasks.md, RESEARCH.md, design.md, or generic .md) as a single self-contained HTML dashboard with sidebar nav, status pills, severity tags, mermaid diagrams, syntax highlighting and dark/light themes. Triggers: "render plan to HTML", "gerar HTML do plano", "transformar MD em HTML", "share this spec in browser", phase artifact handoff to non-engineers.
-version: 0.2.0
+version: 0.2.1
 ---
 
 # render-plans-to-html
@@ -25,7 +25,7 @@ This skill runs via `npx` — no prior install required. Node.js ≥ 20 must be 
 
 1. **Resolve input.** Single `.md`, folder (recursive), or comma-separated list. Ask only if not provided.
 2. **Resolve output.** Default: `<cwd>/plans.html`. Override with `--out`.
-3. **Detect language.** The CLI auto-detects from the system locale; pass `--lang pt-BR|en|es` to override.
+3. **Detect language.** Pass `--lang` matching the language the user has been speaking in the conversation: `pt-BR` for Portuguese, `en` for English, `es` for Spanish. **Do not rely on the system locale alone** — the user's primary language in the chat is more reliable than `$LANG`. Only omit `--lang` when you genuinely cannot tell which language the user prefers; the CLI then falls back to `$LANG`/`$LC_ALL` and finally to English.
 4. **Execute the renderer:**
 
 ```bash

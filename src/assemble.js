@@ -8,13 +8,13 @@ export function assembleHtml(docs, opts = {}) {
     : docs;
 
   const navHtml = allDocs.map(d =>
-    `<a href="#${d.id}" data-target="${d.id}"><span class="doc-type">${d.type}</span>${escapeHtml(d.title)}</a>`
+    `<a href="#${d.id}" data-target="${d.id}"><span class="doc-type">${docTypeLabel(d.type, messages)}</span>${escapeHtml(d.title)}</a>`
   ).join('\n');
 
   const docsHtml = allDocs.map(d => `
 <section class="doc" id="${d.id}">
   <header class="doc-header">
-    <h1>${escapeHtml(d.title)} <span class="doc-type">${d.type}</span></h1>
+    <h1>${escapeHtml(d.title)} <span class="doc-type">${docTypeLabel(d.type, messages)}</span></h1>
     ${renderMetrics(d.signals, messages)}
   </header>
   ${d.bodyHtml}
@@ -47,4 +47,10 @@ function renderRefs(refs, m) {
 
 function escapeHtml(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function docTypeLabel(type, messages) {
+  const key = 'docType' + type.charAt(0).toUpperCase() + type.slice(1);
+  const label = messages.t(key);
+  return escapeHtml(label === key ? type : label);
 }
