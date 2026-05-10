@@ -56,6 +56,18 @@ The installer copies the SKILL.md and CLI to the agent's skills directory, runs 
 
 Both can be overridden via `CLAUDE_SKILLS_DIR` and `CODEX_SKILLS_DIR` environment variables.
 
+## v0.2 dashboard flags
+
+| Flag | Default | Purpose |
+|------|---------|---------|
+| `--lang` | auto-detect | Force UI language: `pt-BR`, `en`, `es` |
+| `--default-agent` | `sonnet` | Agent shown in headline cards (`opus`/`sonnet`/`haiku`/`codex`) |
+| `--seconds-per-step-{small,medium,large}` | 30 / 60 / 120 | ETA seconds per step bucket |
+| `--tokens-per-step-{small,medium,large}` | 1500 / 3500 / 8000 | Token estimate per step bucket |
+| `--price-{agent}-{in,out}` | bundled defaults | Override USD/M tokens per agent |
+| `--burndown-commits` | 12 | Commits per file scanned for the burndown timeline |
+| `--config <file>` | — | JSON file with the same keys as the flags |
+
 ## Local development
 
 ```bash

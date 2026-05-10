@@ -1,7 +1,7 @@
 ---
 name: render-plans-to-html
 description: Use when the user wants to render, visualize, or share Markdown planning artifacts (PLAN.md, REVIEW.md, REQUIREMENTS.md, tasks.md, RESEARCH.md, design.md, or generic .md) as a single self-contained HTML dashboard with sidebar nav, status pills, severity tags, mermaid diagrams, syntax highlighting and dark/light themes. Triggers: "render plan to HTML", "gerar HTML do plano", "transformar MD em HTML", "share this spec in browser", phase artifact handoff to non-engineers.
-version: 0.1.1
+version: 0.2.0
 ---
 
 # render-plans-to-html
@@ -23,17 +23,21 @@ Convert any Markdown planning artifact into one self-contained, offline-capable 
 
 This skill runs via `npx` — no prior install required. Node.js ≥ 20 must be available on `$PATH`.
 
-1. **Resolve input.** Accept a single `.md` file, a folder (recursive `*.md` discovery), or a comma-separated list of paths. Ask only if not provided.
+1. **Resolve input.** Single `.md`, folder (recursive), or comma-separated list. Ask only if not provided.
 2. **Resolve output.** Default: `<cwd>/plans.html`. Override with `--out`.
-3. **Execute the renderer:**
+3. **Detect language.** The CLI auto-detects from the system locale; pass `--lang pt-BR|en|es` to override.
+4. **Execute the renderer:**
 
 ```bash
-npx --yes render-plans-to-html <path>[,path2,...] [--out output.html] [--title "Phase v1.9"] [--theme dark]
+npx --yes render-plans-to-html <path>[,path2,...] \
+  [--out output.html] [--title "Phase v1.9"] \
+  [--lang pt-BR|en|es] [--default-agent opus|sonnet|haiku|codex] \
+  [--theme dark]
 ```
 
-The first run downloads the package into the npm cache (~800 KB); subsequent runs are instant.
+5. **Report.** Print the absolute output path and offer to open it.
 
-4. **Report.** Print the absolute output path and offer to open it (`open <path>` on macOS, `xdg-open <path>` on Linux).
+The HTML opens on an **Overview** tab with progress, ETA per agent, USD cost per agent, severity heatmap and burndown. Click any document in the sidebar to drill down to the original markdown.
 
 ## Behavior
 

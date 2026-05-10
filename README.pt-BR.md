@@ -56,6 +56,18 @@ O instalador copia o SKILL.md e o CLI para o diretório de skills do agente, rod
 
 Ambos podem ser sobrescritos via `CLAUDE_SKILLS_DIR` e `CODEX_SKILLS_DIR`.
 
+## Flags do dashboard v0.2
+
+| Flag | Padrão | Propósito |
+|------|--------|-----------|
+| `--lang` | auto | Idioma da UI: `pt-BR`, `en`, `es` |
+| `--default-agent` | `sonnet` | Agente exibido nos cards principais |
+| `--seconds-per-step-{small,medium,large}` | 30 / 60 / 120 | Segundos por step (ETA) |
+| `--tokens-per-step-{small,medium,large}` | 1500 / 3500 / 8000 | Tokens estimados por step |
+| `--price-{agente}-{in,out}` | defaults | Sobrescreve USD por milhão de tokens |
+| `--burndown-commits` | 12 | Commits por arquivo lidos para o burndown |
+| `--config <file>` | — | Arquivo JSON com as mesmas chaves das flags |
+
 ## Desenvolvimento local
 
 ```bash
